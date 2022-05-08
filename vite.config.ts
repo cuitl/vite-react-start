@@ -6,6 +6,7 @@ import Pages from 'vite-plugin-pages'
 export default defineConfig({
   plugins: [
     react(),
-    Pages()
-  ]
+    // https://github.com/hannoeru/vite-plugin-pages
+    Pages(),
+  ],
 })
