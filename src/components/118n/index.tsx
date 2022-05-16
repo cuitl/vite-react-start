@@ -30,7 +30,7 @@ export const setLocale = (locale: Locale) => {
 
 export const getLocale = () => {
   const locale = localStorage.getItem('_locale') as Locale
-  return locale || 'en-US'
+  return locale || navigator.language || 'en-US'
 }
 
 const useLocale = () => {
@@ -42,6 +42,20 @@ const useLocale = () => {
     __setLocale = _setLocale
     return () => {
       __setLocale = undefined
+    }
+  }, [])
+
+  // 多页面 - locale 同步
+  useEffect(() => {
+    const fn = (e: StorageEvent) => {
+      if (e.key === '_locale' && e.newValue) {
+        _setLocale(e.newValue as Locale)
+      }
+      console.log(e, 'storage change....')
+    }
+    window.addEventListener('storage', fn)
+    return () => {
+      window.removeEventListener('storage', fn)
     }
   }, [])
 
