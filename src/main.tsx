@@ -4,7 +4,7 @@ import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom'
 
-import Provider118n from '@/components/118n'
+import Provideri18n from '@/components/i18n'
 // eslint-disable-next-line import/no-unresolved
 import routes from '~react-pages'
 
@@ -12,9 +12,9 @@ const App = () => {
   // prettier-ignore
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <Provider118n>
+      <Provideri18n>
         {useRoutes(routes)}
-      </Provider118n>
+      </Provideri18n>
     </Suspense>
   )
 }

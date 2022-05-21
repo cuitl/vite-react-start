@@ -14,7 +14,7 @@ const localeLangMap = {
   'en-US': en,
 }
 
-interface Provider118nProps {
+interface Provideri18nProps {
   children: ReactNode
 }
 
@@ -64,7 +64,7 @@ const useLocale = () => {
   }
 }
 
-export default function Provider118n(props: Provider118nProps) {
+export default function Provideri18n(props: Provideri18nProps) {
   const { locale } = useLocale()
 
   return (

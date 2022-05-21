@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl'
 import { Link } from 'react-router-dom'
 
-import { getLocale, setLocale } from '@/components/118n'
+import { getLocale, setLocale } from '@/components/i18n'
 
 export default function LangPage() {
   const intl = useIntl()
