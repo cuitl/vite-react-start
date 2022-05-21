@@ -1,3 +1,5 @@
+import 'virtual:windi.css'
+import 'virtual:windi-devtools'
 import './index.css'
 
 import React, { Suspense } from 'react'
