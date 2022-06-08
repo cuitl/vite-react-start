@@ -28,6 +28,7 @@ if (rootNode) {
       <Router>
         <App></App>
       </Router>
+      ,
     </React.StrictMode>,
   )
 }
