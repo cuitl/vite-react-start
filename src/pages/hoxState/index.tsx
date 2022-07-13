@@ -62,7 +62,7 @@ const Counter = () => {
 
 export default function HoxStatePage() {
   return (
-    <div>
+    <div className="bg-gray-800 text-light-400 text-center py-5 h-100vh">
       <h1 className="text-center text-2xl">
         global hox state use in components
       </h1>

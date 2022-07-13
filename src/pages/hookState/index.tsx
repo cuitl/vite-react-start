@@ -17,7 +17,7 @@ const GlobalStateComp = () => {
     <>
       <b>Counter value: {state.get()}</b> (watch +1 every 3 seconds){' '}
       <button
-        className="flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1"
+        className="flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1 mx-auto my-3"
         onClick={() => state.set(p => p + 1)}
       >
         Increment
@@ -35,7 +35,7 @@ const Counter = () => {
 
   return (
     <button
-      className="flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1"
+      className="flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1 mx-auto my-3"
       onClick={increment}
     >
       + {count.get()}
@@ -45,11 +45,11 @@ const Counter = () => {
 
 export default function HookStatePage() {
   return (
-    <div>
+    <div className="bg-gray-800 text-light-400 text-center py-5 h-100vh">
       <h2>Global State</h2>
       <GlobalStateComp />
       <GlobalStateComp />
-      <hr className="divide-y my-4" />
+      <hr className="divide-y divide-dark-100 my-4" />
 
       <h2>Local State</h2>
       <Counter />
