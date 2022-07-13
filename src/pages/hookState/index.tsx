@@ -54,6 +54,8 @@ export default function HookStatePage() {
       <h2>Local State</h2>
       <Counter />
       <hr className="divide-y my-4" />
+      <Counter />
+      <hr className="divide-y my-4" />
     </div>
   )
 }
