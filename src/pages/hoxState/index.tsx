@@ -63,6 +63,12 @@ const Counter = () => {
 export default function HoxStatePage() {
   return (
     <div>
+      <h1 className="text-center text-2xl">
+        global hox state use in components
+      </h1>
+      <hr className="divide-y my-4" />
+      <Counter></Counter>
+      <hr className="divide-y my-4" />
       <Counter></Counter>
     </div>
   )
