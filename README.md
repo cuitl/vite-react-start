@@ -6,6 +6,8 @@
 
 - eslint + prettier 格式化代码
 
+- 基于 [yorkie](https://github.com/yyx990803/yorkie) + [lint-staged](https://github.com/okonet/lint-staged) 控制 git 提交过程中的代码格式化
+
 - [windicss](https://windicss.org/) surpport
 
 - 添加简单的 React 状态管理库
