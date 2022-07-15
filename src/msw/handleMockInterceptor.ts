@@ -7,7 +7,23 @@
 import { AxiosRequestConfig } from 'axios'
 
 import { API_PROXY_SUFFIX, MOCK_DOMAIN_PREFIX } from './constants'
-import { ifStartPartMock } from './util'
+import { ifStarMock, ifStartPartMock } from './util'
+
+let initDelayPromise: Promise<unknown> | undefined
+
+/**
+ * MSW加载完成前，控制 axios 请求等待
+ * @returns
+ */
+const delayOnMswLoading = () => {
+  if (!ifStarMock()) {
+    initDelayPromise = Promise.resolve()
+  }
+  if (!initDelayPromise) {
+    initDelayPromise = new Promise(resolve => setTimeout(resolve, 600))
+  }
+  return initDelayPromise
+}
 
 /**
  * 对指定URL进行拦截并返回mock数据的处理 拦截器
@@ -17,7 +33,10 @@ import { ifStartPartMock } from './util'
  * @param config
  * @returns
  */
-export default function handleMockInterceptor(config: AxiosRequestConfig) {
+export default async function handleMockInterceptor(
+  config: AxiosRequestConfig,
+) {
+  await delayOnMswLoading()
   console.info('2. handleMockInterceptor....')
   const isMockPartProxy = ifStartPartMock()
   if (!isMockPartProxy) {
