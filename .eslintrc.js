@@ -63,6 +63,7 @@ module.exports = {
     // 'no-unused-vars': ['warn'],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/no-explicit-any': 'off',
 
     // plugin:import/recommended
     'import/no-unresolved': ['warn'],

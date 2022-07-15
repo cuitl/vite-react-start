@@ -3,19 +3,7 @@ import './App.css'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { getUser } from '@/api'
-
 import logo from './logo.svg'
-
-setTimeout(() => {
-  getUser()
-    .then(res => {
-      console.log(res.data)
-    })
-    .catch(e => {
-      console.error('error', e)
-    })
-}, 3000)
 
 function App() {
   const [count, setCount] = useState(0)
@@ -45,13 +33,13 @@ function App() {
         <ul>
           <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
             <NavLink className="text-cyan-400" to="/hookState">
-              hookState
+              HookState
             </NavLink>
           </li>
 
           <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
             <NavLink className="text-cyan-400" to="/hoxState">
-              hoxState
+              HoxState
             </NavLink>{' '}
           </li>
           <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
@@ -61,7 +49,12 @@ function App() {
           </li>
           <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
             <NavLink className="text-cyan-400" to="/windi">
-              windicss
+              Windicss
+            </NavLink>{' '}
+          </li>
+          <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
+            <NavLink className="text-cyan-400" to="/msw">
+              MSW Mock Demo
             </NavLink>{' '}
           </li>
         </ul>

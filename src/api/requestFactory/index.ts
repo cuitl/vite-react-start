@@ -8,6 +8,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
 import handleMockInterceptor from '@/msw/handleMockInterceptor'
+import { BaseResponse } from '@/types'
 
 const DEFAULT_TIMEOUT = 600000
 
@@ -21,7 +22,7 @@ const DEFAULT_TIMEOUT = 600000
  */
 export default function RequestFactory(namespace = '') {
   const instance = axios.create({
-    baseURL: `/${namespace}`,
+    baseURL: namespace.startsWith('/') ? namespace : `/${namespace}`,
     timeout: DEFAULT_TIMEOUT,
   })
 
@@ -45,18 +46,18 @@ export default function RequestFactory(namespace = '') {
 // 1. 确定 BaseResponse 数据结构
 // 2. 确定 状态码 业务类型
 
-interface BaseResponse {
-  errorCode: number
-  errorMessage: string
-  data: unknown
-}
+// interface BaseResponse {
+//   errorCode: number
+//   errorMessage: string
+//   data: unknown
+// }
 
 /**
  * 处理接口的返回拦截
  * @param res
  * @returns
  */
-function responseInterceptors(res: AxiosResponse<BaseResponse>) {
+function responseInterceptors(res: AxiosResponse<BaseResponse<unknown>>) {
   if (res.status !== 200) {
     return console.error(`${res.status}: Network error`)
   }
