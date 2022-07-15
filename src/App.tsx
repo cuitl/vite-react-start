@@ -1,12 +1,28 @@
 import './App.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+
+import { getUser } from '@/api'
 
 import logo from './logo.svg'
 
+setTimeout(() => {
+  getUser()
+    .then(res => {
+      console.log(res.data)
+    })
+    .catch(e => {
+      console.error('error', e)
+    })
+}, 3000)
+
 function App() {
   const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    console.log('App....')
+  }, [])
 
   return (
     <div className="App">

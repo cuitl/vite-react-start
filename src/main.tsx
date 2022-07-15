@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom'
 
 import Provideri18n from '@/components/i18n'
-// eslint-disable-next-line import/no-unresolved
+import { loadMswProxy } from '@/msw'
 import routes from '~react-pages'
 
 const App = () => {
@@ -31,3 +31,5 @@ if (rootNode) {
     </React.StrictMode>,
   )
 }
+
+loadMswProxy()
