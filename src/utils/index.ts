@@ -198,7 +198,7 @@ export const pubSub = (() => {
   }
 
   return Object.assign(_pubSub, {
-    on: on,
+    on,
     once,
     off,
     emit,
