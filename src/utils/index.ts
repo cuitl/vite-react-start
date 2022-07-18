@@ -73,3 +73,134 @@ export const fetchUnique = <T extends (...args: any) => Promise<any>>(
     }
   }
 }
+
+// 发布订阅 一次性事件标识
+const eventOnceKey = Symbol('psub-event-once')
+
+interface PubSubEvent {
+  (...args: any[]): void
+  [eventOnceKey]?: boolean
+}
+
+/**
+ * 自定义发布订阅的实现
+ */
+export const pubSub = (() => {
+  const eventMap: Record<string, PubSubEvent[]> = {}
+  const eventEmitStore: Record<string, any[]> = {}
+
+  const _pubSub = {}
+
+  /**
+   * 自定义事件订阅
+   * storePrev > 0 时，会缓存 emits 参数 {storePrev} 次，再次绑定事件会立即触发上一次的结果
+   * @param eventType 自定义事件类型
+   * @param func 自定义事件处理函数
+   * @param storePrev 自定义事件 emits 缓存次数
+   * @example
+   * pubSub.on('click', (count) => console.log('click', count), 1) // store the lastest emit args
+   * pubSub.emit('click', 100); -> click, 100
+   * pubSub.emit('click', 200); -> click, 200 // 200 is the lastest emit args
+   * pubSub.on('click', (count) => console.log('another click', count)); -> another click, 200 // trigger immediate
+   * @returns
+   */
+  const on = (eventType: string, func: PubSubEvent, storePrev = 0) => {
+    if (!eventMap[eventType]) {
+      eventMap[eventType] = []
+    }
+
+    // emits args store init cache array
+    if (!eventMap[eventType].length && storePrev > 0) {
+      eventEmitStore[eventType] = new Array(storePrev)
+    }
+
+    eventMap[eventType].push(func)
+
+    // emits args apply for new event func
+    if (!func[eventOnceKey] && Array.isArray(eventEmitStore[eventType])) {
+      const emits = eventEmitStore[eventType].filter(
+        args => args && args.length,
+      )
+      emits.forEach(args => {
+        func(...args)
+      })
+    }
+    return _pubSub
+  }
+
+  /**
+   * 绑定自定义事件 - 只触发一次
+   * @param eventType 自定义事件类型
+   * @param func 自定义事件处理函数
+   * @returns
+   */
+  const once = (eventType: string, func: PubSubEvent) => {
+    func[eventOnceKey] = true
+    return on(eventType, func)
+  }
+
+  /**
+   * 解除自定义事件
+   * @param eventType 自定义事件类型
+   * @param func 要解除的函数
+   */
+  const off = (eventType: string, func?: PubSubEvent) => {
+    const events = eventMap[eventType]
+    if (Array.isArray(events)) {
+      if (!func) {
+        eventMap[eventType] = []
+      } else {
+        const index = events.findIndex(fn => fn === func)
+        if (index > -1) {
+          events.splice(index, 1)
+        }
+      }
+
+      // emits args store reset
+      if (!eventMap[eventType].length) {
+        eventEmitStore[eventType] = []
+      }
+    }
+    return _pubSub
+  }
+
+  /**
+   * 发布事件
+   * @param eventType 自定义事件类型
+   * @param args 出发自定义事件的参数
+   * @returns
+   */
+  const emit = (eventType: string, ...args: any[]) => {
+    let events = eventMap[eventType]
+    if (Array.isArray(events)) {
+      if (events.length) {
+        events = events.filter(fn => {
+          fn(...args)
+          return !fn[eventOnceKey]
+        })
+        eventMap[eventType] = events
+
+        // emits args store
+        if (events.length) {
+          const emitStore = eventEmitStore[eventType]
+          if (emitStore && emitStore.length) {
+            emitStore.shift()
+            emitStore.push(args)
+          }
+        }
+      } else {
+        console.warn(`${eventType} is once bind or had clear`)
+      }
+    } else {
+      console.warn(`Not bind any fn for event: ${eventType}, or emit too early`)
+    }
+    return _pubSub
+  }
+
+  return Object.assign(_pubSub, {
+    on: on,
+    once,
+    off,
+    emit,
+  })
+})()
