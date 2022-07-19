@@ -4,112 +4,58 @@
  * 发布者(Publisher) -> |-- 事件中心 --| -> 订阅者(subscribe)
  */
 
-const observerOnceKey = Symbol('observer-once-key')
-
-interface Observer {
-  (...args: any[]): void
-  [observerOnceKey]?: boolean
-}
+import PublishSubject from './PublishSubject'
 
 /**
- * 观察者模式的发布订阅: 发布者 -> 订阅者
- * 被观察者 - Subject ;
- * 观察者 - Observer(纯函数) ;
- * 被观察者.on(观察者) - 添加观察者 ;
- * 被观察者.emit() - 通知观察者
+ * 基于 PublishSubject（观察者模式）实现的发布订阅
+ * 发布者：pubCore.emit -> pubCore(事件调度中心) -> 订阅者(use pubCore.on)
  */
-export class Subject {
-  observers: Observer[] = []
-  emitsStore: any[] = []
+export const pubCore = (() => {
+  const cachePublishSubject: Record<string, PublishSubject> = {}
 
-  constructor(public eventType: string, storePrev = 0) {
-    this.observers = []
-    this.emitsStore = new Array(storePrev)
-  }
-
-  once(ob: Observer) {
-    ob[observerOnceKey] = true
-    return this.on(ob)
-  }
-
-  on(ob: Observer) {
-    this.observers.push(ob)
-
-    // emits args store init cache array
-    if (!ob[observerOnceKey]) {
-      const emitsArgs = this.emitsStore.filter(args => args && args.length > 0)
-      if (emitsArgs.length) {
-        emitsArgs.forEach(args => ob(...args))
-      }
-    }
-    return this
-  }
-
-  off(ob?: Observer) {
-    if (ob) {
-      const index = this.observers.findIndex(f => f === ob)
-      if (index > -1) {
-        this.observers.splice(index, 1)
-      }
-    } else {
-      this.observers = []
-    }
-    return this
-  }
-
-  emit(...args: any[]) {
-    if (this.observers.length) {
-      const observers = this.observers.filter(fn => {
-        fn(...args)
-        return !fn[observerOnceKey]
-      })
-      this.observers = observers
-    } else {
-      console.warn(`${this.eventType} is once bind or had clear`)
-    }
-
-    // emits args store
-    if (this.emitsStore.length && args.length) {
-      this.emitsStore.shift()
-      this.emitsStore.push(args)
-    }
-    return this
-  }
-}
-
-/**
- * 基于 Subject 的发布订阅
- * pubSub2 相当于调度中心
- * 发布者 -> pubSub2 -> 订阅者
- */
-export const pubSub2 = (() => {
-  const cacheSubject: Record<string, Subject> = {}
   return {
+    /**
+     * 初始化 自定义事件的 实例(被观察者), 并设置 emit 信息的存储
+     * 当再次初始化, 观察者将被清空
+     * @param eventType 事件类型
+     * @param storePrev 存储 emit 的信息最近的次数
+     * @example
+     * pubCore.initEvent('click', 1) // 存储最新的 emit 信息
+     * pubCore.on('click', (count) => console.log('click 1', count))
+     *
+     * pubCore.emit('click', 100)
+     * pubCore.emit('click', 200) // 200 is the lastest emit msg
+     *
+     * // this will bind a new click handler fun, && call immediate use 200
+     * pubCore.on('click', (count) => console.log('click 2', count)) // click 2 200
+     */
     initEvent(eventType: string, storePrev = 0) {
-      if (!cacheSubject[eventType]) {
-        cacheSubject[eventType] = new Subject(eventType, storePrev)
+      cachePublishSubject[eventType] = new PublishSubject(eventType, storePrev)
+      return this
+    },
+    once(eventType: string, fn: (...args: any[]) => void) {
+      if (!cachePublishSubject[eventType]) {
+        this.initEvent(eventType)
       }
+      cachePublishSubject[eventType].once(fn)
       return this
     },
-    once(eventType: string, fn: Observer) {
-      this.initEvent(eventType)
-      cacheSubject[eventType].once(fn)
-      return this
-    },
-    on(eventType: string, fn: Observer) {
-      this.initEvent(eventType)
-      cacheSubject[eventType].on(fn)
-      return this
-    },
-    off(eventType: string, fn: Observer) {
-      if (cacheSubject[eventType]) {
-        cacheSubject[eventType].off(fn)
+    on(eventType: string, fn: (...args: any[]) => void) {
+      if (!cachePublishSubject[eventType]) {
+        this.initEvent(eventType)
       }
+      cachePublishSubject[eventType].on(fn)
       return this
     },
+
+    off(eventType: string, fn?: (...args: any[]) => void) {
+      cachePublishSubject[eventType]?.off(fn)
+      return this
+    },
+
     emit(eventType: string, ...args: any[]) {
-      if (cacheSubject[eventType]) {
-        cacheSubject[eventType].emit(...args)
+      if (cachePublishSubject[eventType]) {
+        cachePublishSubject[eventType].emit(...args)
       } else {
         console.warn(
           `Not bind any fn for event: ${eventType}, or emit too early`,
