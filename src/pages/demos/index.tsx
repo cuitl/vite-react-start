@@ -1,4 +1,5 @@
 import StateSubject, {
+  createGlobalState,
   StateObserver,
   useObserverState,
 } from '@/utils/subject/StateSubject'
@@ -45,12 +46,16 @@ function ShareCounter() {
   )
 }
 
-const globalCountObj = new StateSubject({
-  count: 0,
-})
+// const globalCountObj = new StateSubject({
+//   count: 0,
+// })
+
+const useGlobalCountObj = createGlobalState({ count: 0 })
+// useGlobalCountObj.globalState.setState
 
 function ShareCounter2() {
-  const [countObj, setCountObj] = useObserverState(globalCountObj)
+  // const [countObj, setCountObj] = useObserverState(globalCountObj)
+  const [countObj, setCountObj] = useGlobalCountObj()
 
   const onIncrease = () => {
     setCountObj(prev => ({ ...prev, count: prev.count + 1 }))

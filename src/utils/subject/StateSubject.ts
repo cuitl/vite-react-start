@@ -86,3 +86,21 @@ export const useObserverState = <State>(globalState: StateSubject<State>) => {
   const { state, setState } = globalState
   return [state, setState.bind(globalState)] as [typeof state, typeof setState]
 }
+
+/**
+ * 创建共享数据
+ * 缩短创建步骤
+ * @param state 数据
+ * @returns
+ */
+export const createGlobalState = <S>(state: S) => {
+  const globalState = new StateSubject<S>(state)
+
+  const hook = () => {
+    return useObserverState(globalState)
+  }
+
+  hook.globalState = globalState
+
+  return hook
+}
