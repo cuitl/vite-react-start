@@ -28,10 +28,16 @@ export default class StateSubject<State> extends BaseSubject<
     const newState =
       typeof state === 'function' ? (state as SetState<State>)(preState) : state
 
-    if (!Object.is(preState, newState)) {
+    if (this.compare(preState, newState)) {
       this.state = newState
       this.emit(preState, newState)
     }
+  }
+
+  // 比较数据变化
+  compare(preState: State, newState: State) {
+    // TODO 对象型数据深度对比，减少不必要更新
+    return !Object.is(preState, newState)
   }
 }
 
@@ -40,12 +46,16 @@ interface Func {
 }
 
 export class StateObserver<State> extends BaseObserver {
+  sub?: StateSubject<State>
   constructor(name: string, public fn: Func) {
     super(name)
   }
 
   update(sub: StateSubject<State>, ...args: any[]) {
     this.fn(...args)
+    if (!this.sub) {
+      this.sub = sub
+    }
   }
 }
 
@@ -53,7 +63,9 @@ export class StateObserver<State> extends BaseObserver {
  * 使用共享数据的hook
  * 1. 创建全局状态 new StateSubject
  * 2. 在组件中使用该 hook 并传入全局状态（创建观察者并添加到全局状态中）
+ * FIXED 使用 类似 hox deps 依赖数组控制组件更新
  * @param {StateSubject} globalState 创建的全局状态 new StateSubject
+ * @param ifUpdate 手动判断数据变动是否更新组件
  * @example
  * const globalState = new StateSubject<number>(0)
  *
@@ -63,7 +75,10 @@ export class StateObserver<State> extends BaseObserver {
  * }
  * @returns
  */
-export const useObserverState = <State>(globalState: StateSubject<State>) => {
+export const useObserverState = <State>(
+  globalState: StateSubject<State>,
+  ifUpdate?: (prevState: State, newstate: State) => boolean,
+) => {
   const [, _forceUpdate] = useState([])
 
   useEffect(() => {
@@ -71,9 +86,13 @@ export const useObserverState = <State>(globalState: StateSubject<State>) => {
     const ob = new StateObserver<State>(
       `StateObserver:${globalState.uid}`,
       (prev, state) => {
-        console.info('数据变更从 ', prev, '到', state)
-        // 数据变动后组件强制刷新
-        _forceUpdate([])
+        // console.info('数据变更从 ', prev, '到', state)
+        if (ifUpdate) {
+          ifUpdate(prev, state) && _forceUpdate([])
+        } else {
+          // 数据变动后组件强制刷新
+          _forceUpdate([])
+        }
       },
     )
     // 将观察者添加到全局状态 globalState 中，当状态改变时，通知每个观察者
@@ -96,8 +115,8 @@ export const useObserverState = <State>(globalState: StateSubject<State>) => {
 export const createGlobalState = <S>(state: S) => {
   const globalState = new StateSubject<S>(state)
 
-  const hook = () => {
-    return useObserverState(globalState)
+  const hook = (ifUpdate?: (prevState: S, newstate: S) => boolean) => {
+    return useObserverState(globalState, ifUpdate)
   }
 
   hook.globalState = globalState
@@ -107,6 +126,8 @@ export const createGlobalState = <S>(state: S) => {
 
 // from react-use
 export const createGlobalState2 = <S>(state: S) => {
+  const setters: any[] = []
+
   const store = {
     state,
     setState(state: S | SetState<S>) {
@@ -115,33 +136,32 @@ export const createGlobalState2 = <S>(state: S) => {
         typeof state === 'function' ? (state as SetState<S>)(preState) : state
 
       store.state = newState
-      store.setters.forEach(setter => {
+      setters.forEach(setter => {
         console.info('数据变更从 ', preState, '到', newState)
         setter(newState)
       })
     },
-    setters: [] as any[],
   }
 
   const hook = () => {
-    const [globalState, stateSetter] = useState<S>(store.state)
+    const [gState, stateSetter] = useState<S>(store.state)
 
     useEffect(() => {
-      if (!store.setters.includes(stateSetter)) {
-        store.setters.push(stateSetter)
+      if (!setters.includes(stateSetter)) {
+        setters.push(stateSetter)
       }
       return () => {
-        const index = store.setters.findIndex(setter => setter === stateSetter)
+        const index = setters.findIndex(setter => setter === stateSetter)
         if (index > -1) {
-          store.setters.splice(index, 1)
+          setters.splice(index, 1)
         }
       }
     }, [])
 
-    return [globalState, store.setState] as [S, typeof store.setState]
+    return [gState, store.setState] as [S, typeof store.setState]
   }
 
-  hook.setState = store.setState
+  hook.globalState = store
 
   return hook
 }

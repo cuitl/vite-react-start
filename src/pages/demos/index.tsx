@@ -52,12 +52,28 @@ function ShareCounter() {
 // })
 
 // const useGlobalCountObj = createGlobalState2({ count: 0 })
-const useGlobalCountObj = createGlobalState({ count: 0 })
+const useGlobalCountObj = createGlobalState({ count: 0, num: 0 })
 // useGlobalCountObj.globalState.setState
+
+// 制造 num 的更新
+setInterval(() => {
+  useGlobalCountObj.globalState.setState(prev => ({
+    ...prev,
+    num: prev.num + 1,
+  }))
+}, 3000)
 
 function ShareCounter2() {
   // const [countObj, setCountObj] = useObserverState(globalCountObj)
-  const [countObj, setCountObj] = useGlobalCountObj()
+  const [countObj, setCountObj] = useGlobalCountObj((prev, state) => {
+    // 控制 只有 count 属性 变化时才会刷新组件
+    // 适用于部分性能优化的场景
+    return prev.count !== state.count
+  })
+
+  // const [countObj, setCountObj] = useGlobalCountObj()
+
+  console.log(countObj.count, 'count')
 
   const onIncrease = () => {
     setCountObj(prev => ({ ...prev, count: prev.count + 1 }))
