@@ -1,5 +1,6 @@
 import StateSubject, {
   createGlobalState,
+  createGlobalState2,
   StateObserver,
   useObserverState,
 } from '@/utils/subject/StateSubject'
@@ -50,6 +51,7 @@ function ShareCounter() {
 //   count: 0,
 // })
 
+// const useGlobalCountObj = createGlobalState2({ count: 0 })
 const useGlobalCountObj = createGlobalState({ count: 0 })
 // useGlobalCountObj.globalState.setState
 

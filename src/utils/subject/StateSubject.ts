@@ -84,7 +84,7 @@ export const useObserverState = <State>(globalState: StateSubject<State>) => {
   }, [])
 
   const { state, setState } = globalState
-  return [state, setState.bind(globalState)] as [typeof state, typeof setState]
+  return [state, setState.bind(globalState)] as [State, typeof setState]
 }
 
 /**
@@ -101,6 +101,47 @@ export const createGlobalState = <S>(state: S) => {
   }
 
   hook.globalState = globalState
+
+  return hook
+}
+
+// from react-use
+export const createGlobalState2 = <S>(state: S) => {
+  const store = {
+    state,
+    setState(state: S | SetState<S>) {
+      const preState = store.state
+      const newState =
+        typeof state === 'function' ? (state as SetState<S>)(preState) : state
+
+      store.state = newState
+      store.setters.forEach(setter => {
+        console.info('数据变更从 ', preState, '到', newState)
+        setter(newState)
+      })
+    },
+    setters: [] as any[],
+  }
+
+  const hook = () => {
+    const [globalState, stateSetter] = useState<S>(store.state)
+
+    useEffect(() => {
+      if (!store.setters.includes(stateSetter)) {
+        store.setters.push(stateSetter)
+      }
+      return () => {
+        const index = store.setters.findIndex(setter => setter === stateSetter)
+        if (index > -1) {
+          store.setters.splice(index, 1)
+        }
+      }
+    }, [])
+
+    return [globalState, store.setState] as [S, typeof store.setState]
+  }
+
+  hook.setState = store.setState
 
   return hook
 }
