@@ -1,3 +1,44 @@
+import { useEffect } from 'react'
+
+import StateSubject, {
+  StateObserver,
+  useObserverState,
+} from '@/utils/subject/StateSubject'
+
 export default function Demos() {
-  return <div>Demos Page</div>
+  return (
+    <div className="bg-gray-800 text-light-400 text-center h-100vh">
+      <h1 className="border-b-1px border-b-blue-200 py-4">
+        Share state for multi Counter
+      </h1>
+      <ShareCounter />
+      <ShareCounter />
+    </div>
+  )
+}
+
+const globalState = new StateSubject(10)
+
+setInterval(() => {
+  // console.log(globalState.observers)
+  globalState.setState(prev => prev + 1)
+}, 3000)
+
+function ShareCounter() {
+  const [num, setNum] = useObserverState(globalState)
+
+  const onIncrease = () => {
+    setNum(prev => prev + 1)
+  }
+
+  return (
+    <div>
+      <button
+        className="inline-flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1 my-4"
+        onClick={onIncrease}
+      >
+        + {num}
+      </button>
+    </div>
+  )
 }
