@@ -27,7 +27,8 @@ export default class StateSubject<State> extends BaseSubject<
     const preState = this.state
     const newState =
       typeof state === 'function' ? (state as SetState<State>)(preState) : state
-    if (!Object.is(preState, state)) {
+
+    if (!Object.is(preState, newState)) {
       this.state = newState
       this.emit(preState, newState)
     }
