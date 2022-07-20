@@ -1,5 +1,3 @@
-import { useEffect } from 'react'
-
 import StateSubject, {
   StateObserver,
   useObserverState,
@@ -13,6 +11,10 @@ export default function Demos() {
       </h1>
       <ShareCounter />
       <ShareCounter />
+
+      <hr className="divide-y divide-dark-100 my-4" />
+      <ShareCounter2 />
+      <ShareCounter2 />
     </div>
   )
 }
@@ -38,6 +40,29 @@ function ShareCounter() {
         onClick={onIncrease}
       >
         + {num}
+      </button>
+    </div>
+  )
+}
+
+const globalCountObj = new StateSubject({
+  count: 0,
+})
+
+function ShareCounter2() {
+  const [countObj, setCountObj] = useObserverState(globalCountObj)
+
+  const onIncrease = () => {
+    setCountObj(prev => ({ ...prev, count: prev.count + 1 }))
+  }
+
+  return (
+    <div>
+      <button
+        className="inline-flex justify-center justify-items-center bg-blue-500 border hover:bg-blue-600 border-blue-600 rounded-md text-light-500 px-4 py-1 my-4"
+        onClick={onIncrease}
+      >
+        + {countObj.count}
       </button>
     </div>
   )
