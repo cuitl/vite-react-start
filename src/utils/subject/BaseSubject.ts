@@ -7,7 +7,7 @@ import BaseObserver from './BaseObserver'
 
 export default class BaseSubject<T extends BaseObserver> {
   // 观察者列表集合
-  observers: T[] = []
+  protected observers: T[] = []
   constructor(public name: string) {}
 
   // 添加观察者
@@ -21,8 +21,14 @@ export default class BaseSubject<T extends BaseObserver> {
       const index = this.observers.findIndex(o => o === ob)
       if (index > -1) {
         this.observers.splice(index, 1)
+        return true
       }
     }
+    return false
+  }
+
+  logObservers(name?: string) {
+    console.log(name, this.observers)
   }
 
   // 通知所有观察者
