@@ -171,6 +171,9 @@ export const useObserverState = <S>(
           } else {
             // 手动判断前后数据变化，控制是否更新
             newDeps && _forceUpdate([])
+            // if (depsRef.current.length) {
+            //   depsRef.current = []
+            // }
           }
           return
         }

@@ -1,8 +1,10 @@
 /**
  * @file 工具函数集合
  */
+
 export * as pubSub from './pubSub'
 export { pubCore } from './subject'
+export { createGlobalState } from '@/utils/subject/StateSubject'
 
 /**
  * 判断类型是否是 Promise, 如果是Promise 返回 Promise包裹的类，否则返回原类型
