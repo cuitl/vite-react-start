@@ -1,13 +1,11 @@
 /**
  * @file hookstate
- * hookstate 在 React.StrictMode 模式下 locale state 会有问题
- * 从hookstate 4.0.0-rc12后 支持了React.StrictMode模式 -> https://github.com/avkonst/hookstate/commit/9a2784b729766db48460363210e34fca13a00e73
  * https://github.com/avkonst/hookstate
  * examples: https://github.com/avkonst/hookstate/tree/hookstate-4/docs/index/src/examples
  */
-import { createState, useHookstate } from '@hookstate/core'
+import { hookstate, useHookstate } from '@hookstate/core'
 
-const globalState = createState(0)
+const globalState = hookstate(0)
 setInterval(() => globalState.set(p => p + 1), 3000)
 
 const GlobalStateComp = () => {
