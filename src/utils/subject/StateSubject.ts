@@ -222,24 +222,28 @@ export const createGlobalState = <S>(
     get() {
       return globalState.state
     },
+    enumerable: true,
   })
 
   Object.defineProperty(exposeProps, 'setState', {
     get() {
       return globalState.setState.bind(globalState)
     },
+    enumerable: true,
   })
 
   Object.defineProperty(exposeProps, 'onTrap', {
     get() {
       return globalState.on.bind(globalState, 'onTrap')
     },
+    enumerable: true,
   })
 
   Object.defineProperty(exposeProps, 'onUnTrap', {
     get() {
       return globalState.on.bind(globalState, 'onUnTrap')
     },
+    enumerable: true,
   })
 
   const hook = (
