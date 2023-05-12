@@ -57,6 +57,12 @@ function App() {
               MSW Mock Demo
             </NavLink>{' '}
           </li>
+
+          <li className="border-b-blue-400 border-b-1px py-4 text-light-800">
+            <NavLink className="text-cyan-400" to="/demos/socket">
+              Websocket Demo
+            </NavLink>{' '}
+          </li>
         </ul>
       </main>
     </div>
