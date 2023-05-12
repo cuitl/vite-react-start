@@ -31,7 +31,27 @@ type Message = {
   data?: any
 }
 
+// 多个客户端的 ws 实例
+// Note -> 多个用户之间通信
+//  1. 用户唯一id 与 ws实例对应， 如：ws.userId = xxx
+//  2. 用户A发送消息(消息内容、接收人ID)给Server，Server 根据 接收人ID, 找到对应的ws实例进行 消息发送
+// const clientWsSet = new Set<WebSocket>()
+
+// 记录存活的 ws 连接实例
+// const saveLiveWs = (ws: WebSocket) => {
+//   clientWsSet.add(ws)
+//   clientWsSet.forEach(w => {
+//     console.log(w.readyState === w.OPEN, '--', w.readyState)
+//     if (w.readyState !== w.OPEN) {
+//       clientWsSet.delete(w)
+//     }
+//   })
+//   console.log(clientWsSet.size, '***')
+// }
+
 function onConnection(ws: WebSocket) {
+  // saveLiveWs(ws)
+
   ws.on('message', function (data) {
     const message = getJsonOrString(data)
     if (typeof message === 'string') {
