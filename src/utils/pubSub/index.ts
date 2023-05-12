@@ -26,6 +26,7 @@ const eventEmitStore: Record<string, any[]> = {}
  * @param eventType 自定义事件
  * @param storePrev 已经 emit 的信息的存储次数设置
  * @example
+ * 1.
  * pubSub.initEvent('click', 1) // 存储最新的 emit 信息
  * pubSub.on('click', (count) => console.log('click 1', count))
  *
@@ -35,10 +36,16 @@ const eventEmitStore: Record<string, any[]> = {}
  * // this will bind a new click handler fun, && call immediate use 200
  * pubSub.on('click', (count) => console.log('click 2', count)) // click 2 200
  *
+ * 2. 解决以下场景：
+ *  两个异步组件 A 和 B, A组件中绑定事件 `ready`, B 组件中触发事件 `ready`, 运行时会出现两种情况：
+ *  a. pubSub.on('ready', (isReady) => console.log(isReady)) -> pubSub.emit('ready', true)
+ *  b. pubSub.emit('ready', true) -> pubSub.on('ready', (isReady) => console.log(isReady))
  * @returns
  */
 export function initEvent(eventType: string, storePrev = 0) {
-  eventEmitStore[eventType] = new Array(storePrev)
+  if (storePrev > 0) {
+    eventEmitStore[eventType] = new Array(storePrev)
+  }
   return pubSub
 }
 
@@ -117,18 +124,20 @@ export function emit(eventType: string, ...args: any[]) {
         return !fn[eventOnceKey]
       })
       eventMap[eventType] = events
-
-      // emits args store
-      const emitStore = eventEmitStore[eventType]
-      if (emitStore && emitStore.length && args.length) {
-        emitStore.shift()
-        emitStore.push(args)
-      }
     } else {
       console.warn(`${eventType} is once bind or had clear`)
     }
   } else {
     console.warn(`Not bind any fn for event: ${eventType}, or emit too early`)
+  }
+
+  // `emit` run before `on`, save the event with args and trigger immediate when `on` method run
+  // 场景： A组件（异步）绑定 事件， B组件触发 ， B组件先于A组件加载完成
+  // emits args store
+  const emitStore = eventEmitStore[eventType]
+  if (emitStore && emitStore.length && args.length) {
+    emitStore.shift()
+    emitStore.push(args)
   }
   return pubSub
 }
