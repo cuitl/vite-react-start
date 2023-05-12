@@ -18,6 +18,7 @@ module.exports = {
       // set this for core-modules to avoid import appear 'import/no-unresolved' eslint warning
       'virtual:windi.css',
       'virtual:windi-devtools',
+      '~react-pages',
     ],
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
@@ -62,6 +63,7 @@ module.exports = {
     // 'no-unused-vars': ['warn'],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/no-explicit-any': 'off',
 
     // plugin:import/recommended
     'import/no-unresolved': ['warn'],
