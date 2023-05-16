@@ -63,6 +63,8 @@ export default function SocketDemoPage() {
           <div className="inline-flex items-center">{paragraph}</div>
         </li>
       </ul>
+
+      {/* <Client2 /> */}
     </div>
   )
 }
@@ -76,5 +78,30 @@ function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
     >
       {children}
     </button>
+  )
+}
+
+// 模拟另一个客户端的连接
+export function Client2() {
+  const socketRef = useRef<Socket>()
+
+  useEffect(() => {
+    socketRef.current = new Socket()
+
+    socketRef.current.on<number>('time', function (data) {
+      console.log('client2 get serverTime', data)
+    })
+
+    socketRef.current?.send({
+      event: 'time',
+    })
+    return () => {
+      socketRef.current?.destroy()
+    }
+  }, [])
+  return (
+    <div className="border-t-1px border-green-100 my-4">
+      <h1>Client2</h1>
+    </div>
   )
 }
